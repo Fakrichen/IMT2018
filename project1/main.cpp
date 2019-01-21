@@ -9,7 +9,6 @@ using namespace QuantLib;
 
 
 //coucou
-//Salma
 
 int main() {
 
