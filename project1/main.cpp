@@ -7,9 +7,6 @@
 
 using namespace QuantLib;
 
-
-//coucou
-
 int main() {
 
     try {
