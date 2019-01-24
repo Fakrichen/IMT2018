@@ -26,10 +26,12 @@
 #ifndef montecarlo_european_engine_hpp
 #define montecarlo_european_engine_hpp
 
+#include "constantblackscholesprocess.hpp" //! importation du fichier "constant"
 #include <ql/pricingengines/vanilla/mcvanillaengine.hpp>
 #include <ql/processes/blackscholesprocess.hpp>
 #include <ql/termstructures/volatility/equityfx/blackconstantvol.hpp>
 #include <ql/termstructures/volatility/equityfx/blackvariancecurve.hpp>
+#include <ql/quantlib.hpp>
 
 namespace QuantLib {
 
@@ -50,6 +52,8 @@ namespace QuantLib {
             path_pricer_type;
         typedef typename MCVanillaEngine<SingleVariate,RNG,S>::stats_type
             stats_type;
+            
+           
         // constructor
         MCEuropeanEngine_2(
              const boost::shared_ptr<GeneralizedBlackScholesProcess>& process,
@@ -60,10 +64,34 @@ namespace QuantLib {
              Size requiredSamples,
              Real requiredTolerance,
              Size maxSamples,
-             BigNatural seed);
+             BigNatural seed,
+             bool constant); //! définition du boolean dans le constructeur de la classe MCEuropeanEngine_2
+             
       protected:
         boost::shared_ptr<path_pricer_type> pathPricer() const;
+       
+      private: 
+        bool constant_; //! définition de l'attribut boolean
+        
+      public: //! méthode pathGenerator() reprise de la classe MCVanillaEngine
+        boost::shared_ptr<path_generator_type> pathGenerator() const {
+
+            Size dimensions = process_->factors();
+            TimeGrid grid = this->timeGrid();
+            typename RNG::rsg_type generator =
+                RNG::make_sequence_generator(dimensions*(grid.size()-1),seed_);
+            return boost::shared_ptr<path_generator_type>(
+                   new path_generator_type(process_, grid,
+                                           generator, brownianBridge_));
+} //! à modifier
     };
+ 
+ 
+ 
+ 
+ 
+ 
+ 
 
     //! Monte Carlo European engine factory
     template <class RNG = PseudoRandom, class S = Statistics>
@@ -116,7 +144,8 @@ namespace QuantLib {
              Size requiredSamples,
              Real requiredTolerance,
              Size maxSamples,
-             BigNatural seed)
+             BigNatural seed,
+             bool constant) //! définition du boolean dans la nouvelle classe??
     : MCVanillaEngine<SingleVariate,RNG,S>(process,
                                            timeSteps,
                                            timeStepsPerYear,
@@ -126,7 +155,9 @@ namespace QuantLib {
                                            requiredSamples,
                                            requiredTolerance,
                                            maxSamples,
-                                           seed) {}
+                                           seed) {
+                                           constant_ = constant; //! relier le boolean de la classe MCEuropeanEngine_2  celui de la classe MCVanillaEngine
+    }
 
 
     template <class RNG, class S>
