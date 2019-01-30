@@ -1,4 +1,4 @@
-
+* -*- mode: c++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
 
 /*
  Copyright (C) 2003 Ferdinando Ametrano
@@ -89,8 +89,7 @@ namespace QuantLib {
         if(isStrikeIndependent_ && !forceDiscretization_) {
             // exact value for curves
             return x0 *
-                std::exp(dt * (riskFreeRate_ -
-                             dividendYield_));
+                std::exp(dt * (riskFreeRate_ - dividendYield_));
         } else {
             QL_FAIL("not implemented");
         }
@@ -108,7 +107,7 @@ namespace QuantLib {
     }
 
     Real ConstantBlackScholesProcess::variance(Time t0, Real x0, Time dt) const {
-        localVolatility(); // trigger update
+        #localVolatility(); // trigger update
         if(isStrikeIndependent_ && !forceDiscretization_) {
             // exact value for curves
             return blackVolatility_->blackVariance(t0 + dt, 0.01) -
@@ -121,11 +120,12 @@ namespace QuantLib {
 
     Real ConstantBlackScholesProcess::evolve(Time t0, Real x0,
                                                 Time dt, Real dw) const {
-        localVolatility(); // trigger update
+        #localVolatility(); // trigger update
         if (isStrikeIndependent_ && !forceDiscretization_) {
             // exact value for curves
             Real var = variance(t0, x0, dt);
-            Real drift = (riskFreeRate_ -dividendYield_) *dt - 0.5 * var;
+            Real drift = (riskFreeRate_->zeroRate(const Date & d, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true)  -
+            dividendYield_->zeroRate(const Date & d, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true) ) *dt - 0.5 * var;
             return apply(x0, std::sqrt(var) * dw + drift);
         } else
             return apply(x0, discretization_->drift(*this, t0, x0, dt) +
@@ -149,12 +149,12 @@ namespace QuantLib {
 
     const Handle<YieldTermStructure>&
     ConstantBlackScholesProcess::dividendYield() const {
-        return dividendYield_;
+        return dividendYield_->zeroRate(const Date & d, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true) ;
     }
 
     const Handle<YieldTermStructure>&
     ConstantBlackScholesProcess::riskFreeRate() const {
-        return riskFreeRate_;
+        return riskFreeRate_->zeroRate(const Date & d, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true) ;
     }
 
     const Handle<BlackVolTermStructure>&
@@ -164,7 +164,7 @@ namespace QuantLib {
 
     const Handle<LocalVolTermStructure>&
     ConstantBlackScholesProcess::localVolatility() const {
-        if (hasExternalLocalVol_)
+        if (hasExternalLocalVol_)   //c'est quoi ExternalLocalVol_??
             return externalLocalVolTS_;
 
         if (!updated_) {
@@ -188,8 +188,7 @@ namespace QuantLib {
         } else {
             return localVolatility_;
         }
-    }
-
+}
 
     // specific models
 
@@ -240,4 +239,3 @@ namespace QuantLib {
                                      blackVolTS,d,forceDiscretization) {}
 
 }
-
