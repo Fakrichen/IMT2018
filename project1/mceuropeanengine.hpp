@@ -65,7 +65,7 @@ namespace QuantLib {
              Real requiredTolerance,
              Size maxSamples,
              BigNatural seed,
-             bool constant); //! définition du boolean dans le constructeur de la classe MCEuropeanEngine_2
+             bool constant); //! définition du constructeur de la classe MCEuropeanEngine_2 avec en paramètre ajout du booléen
              
       protected:
         boost::shared_ptr<path_pricer_type> pathPricer() const;
@@ -78,12 +78,15 @@ namespace QuantLib {
 
             Size dimensions = process_->factors();
             TimeGrid grid = this->timeGrid();
-            typename RNG::rsg_type generator =
-                RNG::make_sequence_generator(dimensions*(grid.size()-1),seed_);
-            return boost::shared_ptr<path_generator_type>(
-                   new path_generator_type(process_, grid,
-                                           generator, brownianBridge_));
-} //! à modifier
+            typename RNG::rsg_type generator = RNG::make_sequence_generator(dimensions*(grid.size()-1),seed_);
+            if (this->constant_) { //! si booléen VRAI, faire:
+                
+            }
+           
+            else {
+                return boost::shared_ptr<path_generator_type>(new path_generator_type(process_, grid, generator, brownianBridge_));
+            } //! booléen FAUX => on ne change rien
+       } 
     };
  
  
@@ -143,7 +146,7 @@ namespace QuantLib {
              Real requiredTolerance,
              Size maxSamples,
              BigNatural seed,
-             bool constant) //! définition du boolean dans la nouvelle classe??
+             bool constant) //! définition du constructeur de la classe MCEuropeanEngine_2 qui hérite de MCVanillaEngine
     : MCVanillaEngine<SingleVariate,RNG,S>(process,
                                            timeSteps,
                                            timeStepsPerYear,
@@ -154,7 +157,7 @@ namespace QuantLib {
                                            requiredTolerance,
                                            maxSamples,
                                            seed) {
-                                           constant_ = constant; //! relier le boolean de la classe MCEuropeanEngine_2  celui de la classe MCVanillaEngine
+                                           constant_ = constant; //! initialisation de constant_
     }
 
 
