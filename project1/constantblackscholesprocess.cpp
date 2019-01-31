@@ -38,13 +38,32 @@ namespace QuantLib {
              bool forceDiscretization)
     : StochasticProcess1D(disc), x0_(x0), riskFreeRate_(riskFreeTS),
       dividendYield_(dividendTS), blackVolatility_(blackVolTS),
-      forceDiscretization_(forceDiscretization),
-      hasExternalLocalVol_(false), updated_(false) {
+      forceDiscretization_(forceDiscretization), updated_(false) {
         registerWith(x0_);
         registerWith(riskFreeRate_);
         registerWith(dividendYield_);
         registerWith(blackVolatility_);
     }
+    
+    ConstantBlackScholesProcess::ConstantBlackScholesProcess(
+            const Handle<Quote>& x0,
+            const Handle<YieldTermStructure>& dividendTS,
+            const Handle<YieldTermStructure>& riskFreeTS,
+            const Handle<BlackVolTermStructure>& blackVolTS,
+            const ext::shared_ptr<discretization>& disc,
+            bool forceDiscretization,
+            const Date exerciceDate,
+            const double strike)
+    : StochasticProcess1D(disc), x0_(x0), riskFreeRate_(riskFreeTS),
+      dividendYield_(dividendTS), blackVolatility_(blackVolTS),
+      forceDiscretization_(forceDiscretization), updated_(false) {
+        exerciceDate = exerciceDate; 
+        strike=strike;  
+        registerWith(x0_);
+        registerWith(riskFreeRate_);
+        registerWith(dividendYield_);
+        registerWith(blackVolatility_);
+    }    
 
     Real ConstantBlackScholesProcess::x0() const {
         return x0_->value();

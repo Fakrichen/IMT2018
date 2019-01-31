@@ -33,8 +33,6 @@
 
 namespace QuantLib {
 
-    class LocalConstantVol;
-    class LocalVolCurve;
 
     //! Constant Black-Scholes stochastic process
     /*! This class describes the stochastic process \f$ S \f$ governed by
@@ -47,7 +45,11 @@ namespace QuantLib {
         \ingroup processes
     */
     class ConstantBlackScholesProcess : public StochasticProcess1D {
-      public:
+        private:
+            Date exerciceDate;
+            double strike;
+        
+        public:
         ConstantBlackScholesProcess(
             const Handle<Quote>& x0,
             const Handle<YieldTermStructure>& dividendTS,
@@ -61,9 +63,19 @@ namespace QuantLib {
             const Handle<Quote>& x0,
             const Handle<YieldTermStructure>& dividendTS,
             const Handle<YieldTermStructure>& riskFreeTS,
+            const Handle<BlackVolTermStructure>& blackVolTS);
+        
+        ConstantBlackScholesProcess(
+            const Handle<Quote>& x0,
+            const Handle<YieldTermStructure>& dividendTS,
+            const Handle<YieldTermStructure>& riskFreeTS,
             const Handle<BlackVolTermStructure>& blackVolTS,
-            const Handle<LocalVolTermStructure>& localVolTS);
-
+            const ext::shared_ptr<discretization>& d =
+                  ext::shared_ptr<discretization>(new EulerDiscretization),
+            bool forceDiscretization = false,
+            const Date exerciceDate,
+            const double strike);
+        
         //! \name StochasticProcess1D interface
         //@{
         Real x0() const;
@@ -92,7 +104,6 @@ namespace QuantLib {
         const Handle<YieldTermStructure>& dividendYield() const;
         const Handle<YieldTermStructure>& riskFreeRate() const;
         const Handle<BlackVolTermStructure>& blackVolatility() const;
-        const Handle<LocalVolTermStructure>& localVolatility() const;
         //@}
       private:
         Handle<Quote> x0_;
@@ -100,8 +111,6 @@ namespace QuantLib {
         Handle<BlackVolTermStructure> blackVolatility_;
         Handle<LocalVolTermStructure> externalLocalVolTS_;
         bool forceDiscretization_;
-        bool hasExternalLocalVol_;
-        mutable RelinkableHandle<LocalVolTermStructure> localVolatility_;
         mutable bool updated_, isStrikeIndependent_;
     };
 
