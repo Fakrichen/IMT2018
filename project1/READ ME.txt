@@ -12,3 +12,9 @@ we add an if/else statement following this boolean wich will create differents p
 
 
 Question:
+are we supposed to consider the case of Strike-dependent Volatility ? 
+In our case (constant volatility) the black-volatility is equal to the local volatility?
+zeroRate (time t, arg) = zeroRate (Date & d, Date d1 , args ) ? what is the difference? 
+Are we supposed to keep all the specific models (GarmanKohlagenProcess, BlackProcess ..) ? 
+what does the RegisterWith do ? 
+
