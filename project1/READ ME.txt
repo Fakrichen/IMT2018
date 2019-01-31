@@ -1,0 +1,14 @@
+Plan:
+
+For this project we have to make it possible to simplify black scholes processes
+by desactivating some time dependent variables to gain computation speed.
+
+We create constantblacksholesprocess a copy of blackscholesprocess that will handle the simplified operation.
+In constantblacksholesprocess We modify dividendTS riskRate and the functions drift by replacing fowardRate by zeroRate.
+We also disable the update of localVolatility().
+
+We also modify mceuropeanengine by adding a boolean wich allow the user to choose between the two processes and rewrite je pathgeneration.
+we add an if/else statement following this boolean wich will create differents pathgenerator.
+
+
+Question:
