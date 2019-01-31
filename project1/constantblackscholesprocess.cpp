@@ -128,10 +128,7 @@ namespace QuantLib {
                                            riskFreeRate_->referenceDate(), d);
     }
 
-    void ConstantBlackScholesProcess::update() {
-        updated_ = false;
-        StochasticProcess1D::update();
-    }
+  
 
     const Handle<Quote>&
     ConstantBlackScholesProcess::stateVariable() const {
