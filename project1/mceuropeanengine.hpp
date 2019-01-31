@@ -80,7 +80,18 @@ namespace QuantLib {
             TimeGrid grid = this->timeGrid();
             typename RNG::rsg_type generator = RNG::make_sequence_generator(dimensions*(grid.size()-1),seed_);
             if (this->constant_) { //! si booléen VRAI, faire:
+            
+                //TODO remplacer les argument du constructeur de CBSP par leurs valeurs.                                                                                                                                                     
+                const ConstantBlackSholesProcess constant_process = new ConstantBlackSholesProcess(x0,
+                                                                                                   dividentTS,
+                                                                                                   riskFreeTS,
+                                                                                                   blackVolTS,
+                                                                                                   disc,
+                                                                                                   forceDiscretisation);
+                                                                                                   
                 
+                
+                return boost::shared_ptr<path_generator_type>(new path_generator_type(constant_process,grid,generator,brownianBridge_));
             }
            
             else {
