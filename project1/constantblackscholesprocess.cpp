@@ -71,7 +71,9 @@ namespace QuantLib {
         Real sigma = diffusion(t,x);
         // we could be more anticipatory if we know the right dt
         // for which the drift will be used
-        return riskFreeRate_- dividendYield_- 0.5 * sigma * sigma;
+        return riskFreeRate_->zeroRate(const Time & t, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true)
+         - dividendYield_->zeroRate(const Time & t, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true)
+         - 0.5 * sigma * sigma;
     }
 
     Real ConstantBlackScholesProcess::diffusion(Time t, Real x) const {
@@ -89,34 +91,35 @@ namespace QuantLib {
         if(isStrikeIndependent_ && !forceDiscretization_) {
             // exact value for curves
             return x0 *
-                std::exp(dt * (riskFreeRate_ - dividendYield_));
+                std::exp(dt * (riskFreeRate_->zeroRate(const Time & t, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true)
+                               - dividendYield_->zeroRate(const Time & d, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true)));
         } else {
             QL_FAIL("not implemented");
         }
     }
 
     Real ConstantBlackScholesProcess::stdDeviation(Time t0, Real x0, Time dt) const {
-        localVolatility(); // trigger update
-        if(isStrikeIndependent_ && !forceDiscretization_) {
+        //localVolatility(); // trigger update
+        //if(isStrikeIndependent_ && !forceDiscretization_) {
             // exact value for curves
-            return std::sqrt(variance(t0,x0,dt));
-        }
-        else{
-            return discretization_->diffusion(*this,t0,x0,dt);
-        }
-    }
+            //return std::sqrt(variance(t0,x0,dt));
+        //}
+        //else{
+        return discretization_->diffusion(*this,t0,x0,dt);
+        //}
+    //}
 
     Real ConstantBlackScholesProcess::variance(Time t0, Real x0, Time dt) const {
-        #localVolatility(); // trigger update
-        if(isStrikeIndependent_ && !forceDiscretization_) {
+        /*localVolatility(); // trigger update
+        #if(isStrikeIndependent_ && !forceDiscretization_) {
             // exact value for curves
-            return blackVolatility_->blackVariance(t0 + dt, 0.01) -
-                   blackVolatility_->blackVariance(t0, 0.01);
-        }
-        else{
-            return discretization_->variance(*this,t0,x0,dt);
-        }
-    }
+            #return blackVolatility_->blackVariance(t0 + dt, 0.01) -
+                   #blackVolatility_->blackVariance(t0, 0.01);
+        #}*/
+        //else{
+        return discretization_->variance(*this,t0,x0,dt);
+        //}
+    // }
 
     Real ConstantBlackScholesProcess::evolve(Time t0, Real x0,
                                                 Time dt, Real dw) const {
@@ -124,8 +127,8 @@ namespace QuantLib {
         if (isStrikeIndependent_ && !forceDiscretization_) {
             // exact value for curves
             Real var = variance(t0, x0, dt);
-            Real drift = (riskFreeRate_->zeroRate(const Date & d, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true)  -
-            dividendYield_->zeroRate(const Date & d, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true) ) *dt - 0.5 * var;
+            Real drift = (riskFreeRate_->zeroRate(const Time & t, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true)  -
+            dividendYield_->zeroRate(const Time & t, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true) ) *dt - 0.5 * var;
             return apply(x0, std::sqrt(var) * dw + drift);
         } else
             return apply(x0, discretization_->drift(*this, t0, x0, dt) +
@@ -149,12 +152,12 @@ namespace QuantLib {
 
     const Handle<YieldTermStructure>&
     ConstantBlackScholesProcess::dividendYield() const {
-        return dividendYield_->zeroRate(const Date & d, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true) ;
+        return dividendYield_->zeroRate(const Time & t, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true) ;
     }
 
     const Handle<YieldTermStructure>&
     ConstantBlackScholesProcess::riskFreeRate() const {
-        return riskFreeRate_->zeroRate(const Date & d, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true) ;
+        return riskFreeRate_->zeroRate(const Time & t, riskFreeRate_->dayCounter(), Continuous, NoFrequency, true) ;
     }
 
     const Handle<BlackVolTermStructure>&
@@ -164,8 +167,8 @@ namespace QuantLib {
 
     const Handle<LocalVolTermStructure>&
     ConstantBlackScholesProcess::localVolatility() const {
-        if (hasExternalLocalVol_)   //c'est quoi ExternalLocalVol_??
-            return externalLocalVolTS_;
+        /*if (hasExternalLocalVol_)   //c'est quoi ExternalLocalVol_??
+            return externalLocalVolTS_;*/
 
         if (!updated_) {
             isStrikeIndependent_=true;
