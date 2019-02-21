@@ -28,7 +28,6 @@
 #include <ql/processes/eulerdiscretization.hpp>
 #include <ql/termstructures/yieldtermstructure.hpp>
 #include <ql/termstructures/volatility/equityfx/blackvoltermstructure.hpp>
-#include <ql/termstructures/volatility/equityfx/localvoltermstructure.hpp>
 #include <ql/quote.hpp>
 
 namespace QuantLib {
@@ -46,163 +45,36 @@ namespace QuantLib {
     */
     class ConstantBlackScholesProcess : public StochasticProcess1D {
         private:
-            Date exerciceDate;
+            Date exercice_date;
             double strike;
-        
+            const Handle<Quote> x0_BS,
+            const Handle<YieldTermStructure> dividendYield_BS,
+            const Handle<YieldTermStructure> riskFreeRate_BS,
+            const Handle<BlackVolTermStructure> blackVolatility_BS,
+            double risk_rate;
+            double Zero_Rate;
+            double Dividend_yield;
+            double Volat_diffusion;
+            double Risk_drift;
+
         public:
-        ConstantBlackScholesProcess(
-            const Handle<Quote>& x0,
-            const Handle<YieldTermStructure>& dividendTS,
-            const Handle<YieldTermStructure>& riskFreeTS,
-            const Handle<BlackVolTermStructure>& blackVolTS,
-            const ext::shared_ptr<discretization>& d =
-                  ext::shared_ptr<discretization>(new EulerDiscretization),
-            bool forceDiscretization = false);
+            ConstantBlackScholesProcess(
+                const Handle<Quote>& x0,
+                const Handle<YieldTermStructure>& dividendTS,
+                const Handle<YieldTermStructure>& riskFreeTS,
+                const Handle<BlackVolTermStructure>& blackVolTS,
+                const ext::shared_ptr<discretization>& d = ext::shared_ptr<discretization>(new EulerDiscretization),
+                bool forceDiscretization = false,
+                const Date exercice_date,
+                const double strike);
 
-        ConstantBlackScholesProcess(
-            const Handle<Quote>& x0,
-            const Handle<YieldTermStructure>& dividendTS,
-            const Handle<YieldTermStructure>& riskFreeTS,
-            const Handle<BlackVolTermStructure>& blackVolTS);
-        
-        ConstantBlackScholesProcess(
-            const Handle<Quote>& x0,
-            const Handle<YieldTermStructure>& dividendTS,
-            const Handle<YieldTermStructure>& riskFreeTS,
-            const Handle<BlackVolTermStructure>& blackVolTS,
-            const ext::shared_ptr<discretization>& d =
-                  ext::shared_ptr<discretization>(new EulerDiscretization),
-            bool forceDiscretization = false,
-            const Date exerciceDate,
-            const double strike);
-        
-        //! \name StochasticProcess1D interface
-        //@{
-        Real x0() const;
-        /*! \todo revise extrapolation */
-        Real drift(Time t, Real x) const;
-        /*! \todo revise extrapolation */
-        Real diffusion(Time t, Real x) const;
-        Real apply(Real x0, Real dx) const;
-        /*! \warning in general raises a "not implemented" exception.
-                     It should be rewritten to return the expectation E(S)
-                     of the process, not exp(E(log S)).
-        */
-        Real expectation(Time t0, Real x0, Time dt) const;
-        Real stdDeviation(Time t0, Real x0, Time dt) const;
-        Real variance(Time t0, Real x0, Time dt) const;
-        Real evolve(Time t0, Real x0, Time dt, Real dw) const;
-        //@}
-        Time time(const Date&) const;
-        //! \name Observer interface
-        //@{
-        void update();
-        //@}
-        //! \name Inspectors
-        //@{
-        const Handle<Quote>& stateVariable() const;
-        const Handle<YieldTermStructure>& dividendYield() const;
-        const Handle<YieldTermStructure>& riskFreeRate() const;
-        const Handle<BlackVolTermStructure>& blackVolatility() const;
-        //@}
-      private:
-        Handle<Quote> x0_;
-        Handle<YieldTermStructure> riskFreeRate_, dividendYield_;
-        Handle<BlackVolTermStructure> blackVolatility_;
-        Handle<LocalVolTermStructure> externalLocalVolTS_;
-        bool forceDiscretization_;
-        mutable bool updated_, isStrikeIndependent_;
-    };
 
-    //! Black-Scholes (1973) stochastic process
-    /*! This class describes the stochastic process \f$ S \f$ for a stock
-        given by
-        \f[
-            d\ln S(t) = (r(t) - \frac{\sigma(t, S)^2}{2}) dt + \sigma dW_t.
-        \f]
-        \warning while the interface is expressed in terms of \f$ S \f$,
-                 the internal calculations work on \f$ ln S \f$.
-        \ingroup processes
-    */
-    class BlackScholesProcess : public ConstantBlackScholesProcess {
-      public:
-        BlackScholesProcess(
-            const Handle<Quote>& x0,
-            const Handle<YieldTermStructure>& riskFreeTS,
-            const Handle<BlackVolTermStructure>& blackVolTS,
-            const ext::shared_ptr<discretization>& d =
-                  ext::shared_ptr<discretization>(new EulerDiscretization),
-            bool forceDiscretization = false);
-    };
-
-    //! Merton (1973) extension to the Black-Scholes stochastic process
-    /*! This class describes the stochastic process ln(S) for a stock or
-        stock index paying a continuous dividend yield given by
-        \f[
-            d\ln S(t, S) = (r(t) - q(t) - \frac{\sigma(t, S)^2}{2}) dt
-                     + \sigma dW_t.
-        \f]
-        \ingroup processes
-    */
-    class BlackScholesMertonProcess : public ConstantBlackScholesProcess {
-      public:
-        BlackScholesMertonProcess(
-            const Handle<Quote>& x0,
-            const Handle<YieldTermStructure>& dividendTS,
-            const Handle<YieldTermStructure>& riskFreeTS,
-            const Handle<BlackVolTermStructure>& blackVolTS,
-            const ext::shared_ptr<discretization>& d =
-                  ext::shared_ptr<discretization>(new EulerDiscretization),
-            bool forceDiscretization = false);
-    };
-
-    //! Black (1976) stochastic process
-    /*! This class describes the stochastic process \f$ S \f$ for a
-        forward or futures contract given by
-        \f[
-            d\ln S(t) = -\frac{\sigma(t, S)^2}{2} dt + \sigma dW_t.
-        \f]
-        \warning while the interface is expressed in terms of \f$ S \f$,
-                 the internal calculations work on \f$ ln S \f$.
-        \ingroup processes
-    */
-    class BlackProcess : public ConstantBlackScholesProcess {
-      public:
-        BlackProcess(
-            const Handle<Quote>& x0,
-            const Handle<YieldTermStructure>& riskFreeTS,
-            const Handle<BlackVolTermStructure>& blackVolTS,
-            const ext::shared_ptr<discretization>& d =
-                  ext::shared_ptr<discretization>(new EulerDiscretization),
-            bool forceDiscretization = false);
-    };
-
-    //! Garman-Kohlhagen (1983) stochastic process
-    /*! This class describes the stochastic process \f$ S \f$ for an exchange
-        rate given by
-        \f[
-            d\ln S(t) = (r(t) - r_f(t) - \frac{\sigma(t, S)^2}{2}) dt
-                     + \sigma dW_t.
-        \f]
-        \warning while the interface is expressed in terms of \f$ S \f$,
-                 the internal calculations work on \f$ ln S \f$.
-        \ingroup processes
-    */
-    class GarmanKohlagenProcess : public ConstantBlackScholesProcess {
-      public:
-        GarmanKohlagenProcess(
-            const Handle<Quote>& x0,
-            const Handle<YieldTermStructure>& foreignRiskFreeTS,
-            const Handle<YieldTermStructure>& domesticRiskFreeTS,
-            const Handle<BlackVolTermStructure>& blackVolTS,
-            const ext::shared_ptr<discretization>& d =
-                  ext::shared_ptr<discretization>(new EulerDiscretization),
-            bool forceDiscretization = false);
+            Real x0() const;
+            Real drift(Time t, Real x) const;
+            Real diffusion(Time t, Real x) const;
+            Real variance(Time t0, Real x0, Time dt) const;
+            Real stdDeviation(Time t0, Real x0, Time dt) const;
     };
 
 }
-
-
 #endif
-
-
