@@ -72,6 +72,12 @@ namespace QuantLib {
        
       private: 
         bool constant_; //! définition de l'attribut boolean
+        boost::shared_ptr<GeneralizedBlackScholesProcess> process_;
+        bool antithetic_;
+        Size steps_, stepsPerYear_, samples_, maxSamples_;
+        Real tolerance_;
+        bool brownianBridge_;
+        BigNatural seed_;        
         
       public: //! méthode pathGenerator() reprise de la classe MCVanillaEngine
         boost::shared_ptr<path_generator_type> pathGenerator() const {
