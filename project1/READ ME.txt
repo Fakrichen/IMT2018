@@ -1,3 +1,12 @@
+Hello sir,
+We have corrected the errors mentioned on your comments and updated the version of ConstantBlackScholesProcess.
+Besides, we are trying to compile the code in order to test it and compare it to BlackScholesProcess.
+Would you please give us some comments on our  latest version of the code?
+
+Thank you very much.
+
+
+
 Plan:
 
 For this project we have to make it possible to simplify black scholes processes
