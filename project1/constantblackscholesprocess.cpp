@@ -25,48 +25,52 @@
 
 namespace QuantLib {
 
-    ConstantBlackScholesProcess::ConstantBlackScholesProcess(
-            const Handle<Quote>& x0,
-            const Handle<YieldTermStructure>& dividendTS,
-            const Handle<YieldTermStructure>& riskFreeTS,
-            const Handle<BlackVolTermStructure>& blackVolTS,
-            const ext::shared_ptr<discretization>& disc,
-            bool forceDiscretization,
-            const Date exercice_date,
-            const double strike)
-    : StochasticProcess1D(disc), x0_BS(x0), riskFreeRate_BS(riskFreeTS),
-      dividendYield_BS(dividendTS), blackVolatility_BS(blackVolTS),
-      forceDiscretization_(forceDiscretization), updated_(false) {
-        exercice_date = exercice_date; 
-        strike = strike;
-        risk_rate = riskFreeRate_->dayCounter();
-        Zero_Rate = riskFreeRate_->zeroRate(exercice_date, risk_rate, Continuous, NoFrequency, true);
-        Dividend_yield = dividendYield_->zeroRate(exercice_date, risk_rate, Continuous, NoFrequency, true);
-        Volat_diffusion = blackVolatility_->blackVol(exercice_date,strike);
-        Risk_drift = Zero_Rate - Dividend_yield;
 
-    }    
 
-    Real ConstantBlackScholesProcess::x0() const {
-        return x0_->value();
-    }
+	constantBlackScholesProcess::constantBlackScholesProcess(
+		const Handle<Quote> x0,
+		const Date exercice_Date,
+		const Real strike,
+		const Handle<YieldTermStructure>& risk_free_BS,
+		const Handle<BlackVolTermStructure>& volatility_BS,
+		const Handle<YieldTermStructure>& dividend_yield_BS,
+		boost::shared_ptr<discretization>& disc)
+		:StochasticProcess1D(disc), x0_(x0), strike_(strike),
 
-    Real ConstantBlackScholesProcess::diffusion(Time t, Real S) const {
-        return S * Volat_diffusion;
-    }  
+		riskFreeRate_(risk_free_BS), dividendYield_(dividend_yield_BS), blackVolatility_(volatility_BS) {
 
-    Real ConstantBlackScholesProcess::drift(Time t, Real S) const {
-        return S * Risk_drift;
-    }
+		exercice_date = exercice_Date;
+		risk_drift = riskFreeRate_->zeroRate(exercice_date, 
+									riskFreeRate_->dayCounter(), 
+									Continuous,
+									NoFrequency, 
+									true) 
+					- dividendYield_->zeroRate(exercice_date, 
+											   riskFreeRate_->dayCounter(), 
+											   Continuous,
+											   NoFrequency, 
+											   true);
 
-    Real ConstantBlackScholesProcess::variance(Time t0, Real x0, Time dt) const {
- 
-        return discretization_->variance(*this,t0,x0,dt);
-    }
+		diffusion_ = blackVolatility_->blackVol(exercice_date,strike_);
 
-    Real GeneralizedBlackScholesProcess::stdDeviation(Time t0, Real x0, Time dt) const {
+	}
 
-        return discretization_->diffusion(*this,t0,x0,dt);
-    }
+	Real constantBlackScholesProcess::x0()const {
+		return x0_->value();
+	}
+
+	Real constantBlackScholesProcess::drift(Time t, Real s) const {
+		return risk_drift*s;
+	}
+
+	Real constantBlackScholesProcess::diffusion(Time t, Real s) const {
+		return diffusion_*s;
+	}
+
+	Real constantBlackScholesProcess::variance(const StochasticProcess1D&,
+		Time t0, Real s0, Time dt) const {
+		return discretization_->variance(*this, t0, s0, dt);
+
+	}
 
 }
