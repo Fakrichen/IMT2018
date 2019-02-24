@@ -43,38 +43,39 @@ namespace QuantLib {
                  the internal calculations work on \f$ ln S \f$.
         \ingroup processes
     */
-    class ConstantBlackScholesProcess : public StochasticProcess1D {
-        private:
-            Date exercice_date;
-            double strike;
-            const Handle<Quote> x0_BS,
-            const Handle<YieldTermStructure> dividendYield_BS,
-            const Handle<YieldTermStructure> riskFreeRate_BS,
-            const Handle<BlackVolTermStructure> blackVolatility_BS,
-            double risk_rate;
-            double Zero_Rate;
-            double Dividend_yield;
-            double Volat_diffusion;
-            double Risk_drift;
+   namespace QuantLib {
 
-        public:
-            ConstantBlackScholesProcess(
-                const Handle<Quote>& x0,
-                const Handle<YieldTermStructure>& dividendTS,
-                const Handle<YieldTermStructure>& riskFreeTS,
-                const Handle<BlackVolTermStructure>& blackVolTS,
-                const ext::shared_ptr<discretization>& d = ext::shared_ptr<discretization>(new EulerDiscretization),
-                bool forceDiscretization = false,
-                const Date exercice_date,
-                const double strike);
+	class constantBlackScholesProcess : public StochasticProcess1D {
+	 private:
+   Handle<Quote> x0_;
+   Handle<YieldTermStructure> riskFreeRate_;
+   Handle<YieldTermStructure> 	dividendYield_;
+   Handle<BlackVolTermStructure> blackVolatility_;
+   Real risk_drift;
+   Real diffusion_;
+   Date exercice_date;
+   Real strike_;
+
+	public:
+		 constantBlackScholesProcess(
+			const Handle <Quote> x0,
+			const Date exercice_Date,
+			const Real strike,
+			const Handle<YieldTermStructure>& risk_free_BS,
+			const Handle<BlackVolTermStructure>& volatility_BS,
+			const Handle<YieldTermStructure>& dividend_yield_BS,
+			boost::shared_ptr<discretization>& disc);
 
 
-            Real x0() const;
-            Real drift(Time t, Real x) const;
-            Real diffusion(Time t, Real x) const;
-            Real variance(Time t0, Real x0, Time dt) const;
-            Real stdDeviation(Time t0, Real x0, Time dt) const;
-    };
+		Real x0() const;
+		Real drift(Time t, Real s) const;
+		Real diffusion(Time t, Real s) const;
+		Real variance(const StochasticProcess1D&,
+			              Time t0, 
+                 Real s0, 
+                 Time dt) const;
+	};
 
 }
+
 #endif
