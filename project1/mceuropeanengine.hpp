@@ -33,6 +33,9 @@
 #include <ql/termstructures/volatility/equityfx/blackvariancecurve.hpp>
 #include <ql/quantlib.hpp>
 
+
+
+
 namespace QuantLib {
 
     //! European option pricing engine using Monte Carlo simulation
@@ -81,29 +84,49 @@ namespace QuantLib {
         
       public: //! méthode pathGenerator() reprise de la classe MCVanillaEngine
         boost::shared_ptr<path_generator_type> pathGenerator() const {
+			Size dimensions = process_->factors();
+			TimeGrid grid = this->timeGrid();
+			typename RNG::rsg_type generator =
+					RNG::make_sequence_generator(dimensions*(grid.size()-1),seed_);
+			if (this->constant_ ){
+				
+				
+				return boost::shared_ptr<path_generator_type>(
+					new path_generator_type(process_, grid,
+											generator, brownianBridge_));
+			}
+			// we can not compile this part
+		
+			else{
+				boost::shared_ptr<GeneralizedBlackScholesProcess> process =boost::dynamic_pointer_cast<GeneralizedBlackScholesProcess>(this->process_);
+				boost::shared_ptr<PlainVanillaPayoff> payoff = boost::dynamic_pointer_cast<PlainVanillaPayoff>(this->arguments_.payoff);
+                QL_REQUIRE(payoff, "non-plain payoff given");
+				/*boost::shared_ptr<constantBlackScholesProcess> const_process =boost::dynamic_pointer_cast<constantBlackScholesProcess>(
+                                                        new constantBlackScholesProcess(process->stateVariable(), 
+                                                        this->arguments_.exercise->lastDate(),
+                                                        payoff->strike(), process->riskFreeRate(),
+                                                                process->blackVolatility(), 
+                                                                process->dividendYield(),
+                                                                boost::shared_ptr<StochasticProcess1D::discretization>(new EulerDiscretization)));*/
+                                //
+                boost::shared_ptr<StochasticProcess1D::discretization> disc = new EulerDiscretization ;
+				return boost::shared_ptr<path_generator_type>(
+                                        new path_generator_type(
 
-            Size dimensions = process_->factors();
-            TimeGrid grid = this->timeGrid();
-            typename RNG::rsg_type generator = RNG::make_sequence_generator(dimensions*(grid.size()-1),seed_);
-            if (this->constant_) { //! si booléen VRAI, faire:
-            
-                //TODO remplacer les argument du constructeur de CBSP par leurs valeurs.                                                                                                                                                     
-                const ConstantBlackSholesProcess constant_process = new ConstantBlackSholesProcess(x0,
-                                                                                                   dividentTS,
-                                                                                                   riskFreeTS,
-                                                                                                   blackVolTS,
-                                                                                                   disc,
-                                                                                                   forceDiscretisation);
-                                                                                                   
-                
-                
-                return boost::shared_ptr<path_generator_type>(new path_generator_type(constant_process,grid,generator,brownianBridge_));
-            }
-           
-            else {
-                return boost::shared_ptr<path_generator_type>(new path_generator_type(process_, grid, generator, brownianBridge_));
-            } //! booléen FAUX => on ne change rien
-       } 
+                                                
+                                                        new constantBlackScholesProcess(process->stateVariable(), 
+                                                        this->arguments_.exercise->lastDate(),
+                                                        payoff->strike(), process->riskFreeRate(),
+                                                                process->blackVolatility(), 
+                                                                process->dividendYield(),
+                                                                disc),
+                                                grid,
+                                                generator,
+                                                brownianBridge_));
+                        }
+                        
+					
+			}
     };
  
  
