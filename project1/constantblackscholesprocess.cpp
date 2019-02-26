@@ -21,7 +21,7 @@
 #include <ql/termstructures/yield/flatforward.hpp>
 #include <ql/time/calendars/nullcalendar.hpp>
 #include <ql/time/daycounters/actual365fixed.hpp>
-#include "constantblackscholesprocess.hpp"
+#include "constantBlackScholesProcess.hpp"
 
 namespace QuantLib {
 
@@ -34,7 +34,7 @@ namespace QuantLib {
 		const Handle<YieldTermStructure>& risk_free_BS,
 		const Handle<BlackVolTermStructure>& volatility_BS,
 		const Handle<YieldTermStructure>& dividend_yield_BS,
-		boost::shared_ptr<discretization>& disc)
+		const boost::shared_ptr<discretization>& disc)
 		:StochasticProcess1D(disc), x0_(x0), strike_(strike),
 
 		riskFreeRate_(risk_free_BS), dividendYield_(dividend_yield_BS), blackVolatility_(volatility_BS) {
