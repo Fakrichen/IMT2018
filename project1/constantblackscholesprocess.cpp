@@ -67,10 +67,5 @@ namespace QuantLib {
 		return diffusion_*s;
 	}
 
-	Real constantBlackScholesProcess::variance(const StochasticProcess1D&,
-		Time t0, Real s0, Time dt) const {
-		return discretization_->variance(*this, t0, s0, dt);
-
-	}
 
 }
