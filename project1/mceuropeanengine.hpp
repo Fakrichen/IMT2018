@@ -26,8 +26,11 @@
 #ifndef montecarlo_european_engine_hpp
 #define montecarlo_european_engine_hpp
 
-#include "constantblackscholesprocess.hpp" //! importation du fichier "constant"
+
+#include "constantBlackScholesProcess.hpp" //! importation du fichier "constant"
 #include <ql/pricingengines/vanilla/mcvanillaengine.hpp>
+#include <ql/processes/eulerdiscretization.hpp>
+
 #include <ql/processes/blackscholesprocess.hpp>
 #include <ql/termstructures/volatility/equityfx/blackconstantvol.hpp>
 #include <ql/termstructures/volatility/equityfx/blackvariancecurve.hpp>
@@ -89,39 +92,31 @@ namespace QuantLib {
 			typename RNG::rsg_type generator =
 					RNG::make_sequence_generator(dimensions*(grid.size()-1),seed_);
 			if (this->constant_ ){
-				
-				
 				return boost::shared_ptr<path_generator_type>(
 					new path_generator_type(process_, grid,
 											generator, brownianBridge_));
 			}
-			// we can not compile this part
+	
+	
 		
 			else{
 				boost::shared_ptr<GeneralizedBlackScholesProcess> process =boost::dynamic_pointer_cast<GeneralizedBlackScholesProcess>(this->process_);
 				boost::shared_ptr<PlainVanillaPayoff> payoff = boost::dynamic_pointer_cast<PlainVanillaPayoff>(this->arguments_.payoff);
                 QL_REQUIRE(payoff, "non-plain payoff given");
-				/*boost::shared_ptr<constantBlackScholesProcess> const_process =boost::dynamic_pointer_cast<constantBlackScholesProcess>(
-                                                        new constantBlackScholesProcess(process->stateVariable(), 
-                                                        this->arguments_.exercise->lastDate(),
-                                                        payoff->strike(), process->riskFreeRate(),
-                                                                process->blackVolatility(), 
-                                                                process->dividendYield(),
-                                                                boost::shared_ptr<StochasticProcess1D::discretization>(new EulerDiscretization)));*/
-                                //
-                //boost::shared_ptr<StochasticProcess1D::discretization> disc(new EulerDiscretization);
+	
+	
 				return boost::shared_ptr<path_generator_type>(
-                                        new path_generator_type(
-
-                                                
-                                                        new constantBlackScholesProcess(process->stateVariable(), 
-                                                        this->arguments_.exercise->lastDate(),
-                                                        payoff->strike(), process->riskFreeRate(),
-                                                                process->blackVolatility(), 
-                                                                process->dividendYield()),
-                                                grid,
-                                                generator,
-                                                brownianBridge_));
+                                        new path_generator_type(boost::shared_ptr<constantBlackScholesProcess> (new constantBlackScholesProcess(process->stateVariable(),
+                                        this->arguments_.exercise->lastDate(),
+                                        payoff->strike(),
+                                        process->riskFreeRate(),
+                                        
+                                        process->blackVolatility(), 
+                                        process->dividendYield()
+                                                                )),grid,
+											generator, brownianBridge_)
+                                        
+                                          );
                         }
                         
 					
