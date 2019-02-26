@@ -109,7 +109,7 @@ namespace QuantLib {
                                                                 process->dividendYield(),
                                                                 boost::shared_ptr<StochasticProcess1D::discretization>(new EulerDiscretization)));*/
                                 //
-                boost::shared_ptr<StochasticProcess1D::discretization> disc(new EulerDiscretization);
+                //boost::shared_ptr<StochasticProcess1D::discretization> disc(new EulerDiscretization);
 				return boost::shared_ptr<path_generator_type>(
                                         new path_generator_type(
 
@@ -118,8 +118,7 @@ namespace QuantLib {
                                                         this->arguments_.exercise->lastDate(),
                                                         payoff->strike(), process->riskFreeRate(),
                                                                 process->blackVolatility(), 
-                                                                process->dividendYield(),
-                                                                disc),
+                                                                process->dividendYield()),
                                                 grid,
                                                 generator,
                                                 brownianBridge_));
