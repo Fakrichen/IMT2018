@@ -57,10 +57,22 @@ int main() {
 		std::cout << "MCEuropeanEngine avec GeneralizedBlackScholesProcess" << std::endl;
 		std::cout << "price = option_1.NPV()=" << price << std::endl;
 		std::cout << "test 1 " << std::endl;
-		boost::shared_ptr<PricingEngine> eng  (boost::make_shared<MCEuropeanEngine_2<PseudoRandom> >(process_BS,10,Null<Size>(),true,false,10000,Null<Real>(),Null<Size>(), SeedGenerator::instance().get(),false));
 		
+		/*
+		boost::shared_ptr<Obj> obj;
+		obj->Something(); // assertion failed
+
+		boost::shared_ptr<Obj> obj(new Obj);
+		obj->Something(); // ok
+*/
+		boost::shared_ptr<PricingEngine> eng(new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),true,false,10000,Null<Real>(),Null<Size>(), SeedGenerator::instance().get(),false));
+		
+	//	option_1.setPricingEngine(boost::shared_ptr<PricingEngine> eng (new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),true,false,10000,Null<Real>(),Null<Size>(), SeedGenerator::instance().get(),false)));
 		option_1.setPricingEngine(eng);
+				
+	
 		std::cout << "test 2" << std::endl;
+		
 		clock_t t_debut = clock();
 		Real price1 = option_1.NPV();
 		std::cout << "Prix de l'option " << price1 << std::endl;
@@ -69,9 +81,11 @@ int main() {
 		
 		
 		std::cout << "MCEuropeanEngine avec constantBlackScholesProcess" << std::endl;
-		option_2.setPricingEngine(
-			boost::shared_ptr<PricingEngine>(
-				new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),true,false,10000,Null<Real>(),Null<Size>(), SeedGenerator::instance().get(),true)));
+	
+		boost::shared_ptr<PricingEngine>  eng1 (new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),true,false,10000,Null<Real>(),Null<Size>(), SeedGenerator::instance().get(),true));
+		option_2.setPricingEngine(eng1);
+
+		
 		
 		clock_t t_debut_2 = clock();
 
