@@ -102,7 +102,7 @@ namespace QuantLib {
 			else{
 				boost::shared_ptr<GeneralizedBlackScholesProcess> process =boost::dynamic_pointer_cast<GeneralizedBlackScholesProcess>(this->process_);
 				boost::shared_ptr<PlainVanillaPayoff> payoff = boost::dynamic_pointer_cast<PlainVanillaPayoff>(this->arguments_.payoff);
-                QL_REQUIRE(payoff, "non-plain payoff given");
+                		QL_REQUIRE(payoff, "non-plain payoff given");
 	
 	
 				return boost::shared_ptr<path_generator_type>(
