@@ -94,7 +94,7 @@ namespace QuantLib {
 			if (this->constant_ ){
 				return boost::shared_ptr<path_generator_type>(
 					new path_generator_type(process_, grid,
-											generator, brownianBridge_));
+					generator, brownianBridge_));
 			}
 	
 	
