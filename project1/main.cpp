@@ -58,17 +58,8 @@ int main() {
 		std::cout << "price = option_1.NPV()=" << price << std::endl;
 		std::cout << "test 1 " << std::endl;
 		
-		/*
-		boost::shared_ptr<Obj> obj;
-		obj->Something(); // assertion failed
-
-		boost::shared_ptr<Obj> obj(new Obj);
-		obj->Something(); // ok
-*/
-		boost::shared_ptr<PricingEngine> eng(new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),true,false,10000,Null<Real>(),Null<Size>(), SeedGenerator::instance().get(),false));
-		
-	//	option_1.setPricingEngine(boost::shared_ptr<PricingEngine> eng (new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),true,false,10000,Null<Real>(),Null<Size>(), SeedGenerator::instance().get(),false)));
-		option_1.setPricingEngine(eng);
+	
+		option_1.setPricingEngine(boost::shared_ptr<PricingEngine>(new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),true,false,10000,Null<Real>(),Null<Size>(), SeedGenerator::instance().get(),false)));
 				
 	
 		std::cout << "test 2" << std::endl;
@@ -82,8 +73,8 @@ int main() {
 		
 		std::cout << "MCEuropeanEngine avec constantBlackScholesProcess" << std::endl;
 	
-		boost::shared_ptr<PricingEngine>  eng1 (new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),true,false,10000,Null<Real>(),Null<Size>(), SeedGenerator::instance().get(),true));
-		option_2.setPricingEngine(eng1);
+		option_2.setPricingEngine(boost::shared_ptr<PricingEngine>(new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),true,false,10000,Null<Real>(),Null<Size>(), SeedGenerator::instance().get(),true)));
+
 
 		
 		
