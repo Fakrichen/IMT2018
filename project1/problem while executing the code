@@ -1,0 +1,4 @@
+Problem : 
+We have a problem while executing the main, the error message is Boost Assertion failed : px != 0.
+I figuered out that the program doesn't enter to the pathGenerator method. 
+Could you please check the code ? (it compiles successfully)
