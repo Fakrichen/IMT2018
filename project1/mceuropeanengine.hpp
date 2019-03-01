@@ -4,16 +4,13 @@
  Copyright (C) 2000, 2001, 2002, 2003 RiskMap srl
  Copyright (C) 2003 Ferdinando Ametrano
  Copyright (C) 2007, 2008 StatPro Italia srl
-
  This file is part of QuantLib, a free-software/open-source library
  for financial quantitative analysts and developers - http://quantlib.org/
-
  QuantLib is free software: you can redistribute it and/or modify it
  under the terms of the QuantLib license.  You should have received a
  copy of the license along with this program; if not, please email
  <quantlib-dev@lists.sf.net>. The license is also available online at
  <http://quantlib.org/license.shtml>.
-
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  FOR A PARTICULAR PURPOSE.  See the license for more details.
@@ -43,7 +40,6 @@ namespace QuantLib {
 
     //! European option pricing engine using Monte Carlo simulation
     /*! \ingroup vanillaengines
-
         \test the correctness of the returned value is tested by
               checking it against analytic results.
     */
@@ -102,29 +98,19 @@ namespace QuantLib {
                                         this->arguments_.exercise->lastDate(),
                                         payoff->strike(),
                                         process->riskFreeRate(),
-                                        
+
                                         process->blackVolatility(), 
                                         process->dividendYield()
                                                                 )),grid,
 											generator, brownianBridge_)
                                         
-                                          );
-				
-			}
-	
-	
-		
+                                          );				
+			}	
 			else{
-				
 				return boost::shared_ptr<path_generator_type>(
 					new path_generator_type(process_, grid,
-											generator, brownianBridge_));
-											
-											
-				
-                        }
-                        
-					
+											generator, brownianBridge_));				
+                        }				
 			}
     };
  
@@ -148,6 +134,7 @@ namespace QuantLib {
         MakeMCEuropeanEngine_2& withMaxSamples(Size samples);
         MakeMCEuropeanEngine_2& withSeed(BigNatural seed);
         MakeMCEuropeanEngine_2& withAntitheticVariate(bool b = true);
+        MakeMCEuropeanEngine_2& withconstParameter (bool constant);
         // conversion to pricing engine
         operator boost::shared_ptr<PricingEngine>() const;
       private:
@@ -157,6 +144,7 @@ namespace QuantLib {
         Real tolerance_;
         bool brownianBridge_;
         BigNatural seed_;
+        bool constant_;
     };
 
     class EuropeanPathPricer_2 : public PathPricer<Path> {
@@ -230,7 +218,7 @@ namespace QuantLib {
     : process_(process), antithetic_(false),
       steps_(Null<Size>()), stepsPerYear_(Null<Size>()),
       samples_(Null<Size>()), maxSamples_(Null<Size>()),
-      tolerance_(Null<Real>()), brownianBridge_(false), seed_(0) {}
+      tolerance_(Null<Real>()), brownianBridge_(false), seed_(0){}
 
     template <class RNG, class S>
     inline MakeMCEuropeanEngine_2<RNG,S>&
@@ -239,6 +227,12 @@ namespace QuantLib {
         return *this;
     }
 
+	template <class RNG, class S>
+    inline MakeMCEuropeanEngine_2<RNG,S>&
+    MakeMCEuropeanEngine_2<RNG,S>::withconstParameter(bool constant) {
+        constant_ = constant;
+        return *this;
+    }
     template <class RNG, class S>
     inline MakeMCEuropeanEngine_2<RNG,S>&
     MakeMCEuropeanEngine_2<RNG,S>::withStepsPerYear(Size steps) {
@@ -311,7 +305,7 @@ namespace QuantLib {
                                       antithetic_,
                                       samples_, tolerance_,
                                       maxSamples_,
-                                      seed_));
+                                      seed_, constant_));
     }
 
 
