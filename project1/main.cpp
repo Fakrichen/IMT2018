@@ -20,17 +20,17 @@ int main() {
 		//maturite
 		Date T(1, March, 2020);
 		//type d'option 
-		Option::Type type(Option::Call);
+		Option::Type type(Option::Put);
 		//Sous jacent
-		Real stock_price = 90;
+		Real stock_price = 100;
 		//Prix d'exercice
-		Real strike = 100;
+		Real strike = 80;
 		//Taux de dividende
-		Spread q = 0.02;
+		Spread q = 0.03;
 		//Taux d'interet
 		Rate r = 0.05;
 		//volatilite
-		Volatility vol = 0.2;
+		Volatility vol = 0.15;
 		
 		// Construction du taux d'interet
 		Handle<YieldTermStructure> rate(boost::shared_ptr<YieldTermStructure>(new FlatForward(t0, r, dayCounter)));
@@ -52,38 +52,42 @@ int main() {
 		option_1.setPricingEngine(boost::shared_ptr<PricingEngine>(new AnalyticEuropeanEngine(process_BS)));
 		option_2.setPricingEngine(boost::shared_ptr<PricingEngine>(new AnalyticEuropeanEngine(process_BS)));
 
-
+		std::cout << "     " << std::endl;
 		Real price = option_1.NPV();
+		std::cout << "prix = option_1.NPV()=" << price << std::endl;
+		std::cout << "     " << std::endl;
 		std::cout << "MCEuropeanEngine avec GeneralizedBlackScholesProcess" << std::endl;
-		std::cout << "price = option_1.NPV()=" << price << std::endl;
-		std::cout << "test 1 " << std::endl;
-		
-	
-		option_1.setPricingEngine(boost::shared_ptr<PricingEngine>(new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),true,false,10000,Null<Real>(),Null<Size>(), SeedGenerator::instance().get(),false)));
-				
-	
-		std::cout << "test 2" << std::endl;
-		
+		std::cout << "     " << std::endl;
+
+
+		option_1.setPricingEngine(boost::shared_ptr<PricingEngine>(new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),
+																											true,false,
+																											10000,Null<Real>(),Null<Size>(), 
+																											SeedGenerator::instance().get(),
+																											false)));
+						
 		clock_t t_debut = clock();
 		Real price1 = option_1.NPV();
 		std::cout << "Prix de l'option " << price1 << std::endl;
 		printf("Temps d'execution: %.2fs\n", (double)(clock() - t_debut) / CLOCKS_PER_SEC);
-		std::cout << "Erreur d'estimation " << option_1.errorEstimate() << std::endl;
+		std::cout << "Erreur d'estimation " << option_1.errorEstimate() << std::endl;	
 		
-		
+		std::cout << "     " << std::endl;
+		std::cout << "     " << std::endl;
 		std::cout << "MCEuropeanEngine avec constantBlackScholesProcess" << std::endl;
+		std::cout << "     " << std::endl;
 	
-		option_2.setPricingEngine(boost::shared_ptr<PricingEngine>(new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),true,false,10000,Null<Real>(),Null<Size>(), SeedGenerator::instance().get(),true)));
-
-
-		
-		
+		option_2.setPricingEngine(boost::shared_ptr<PricingEngine>(new MCEuropeanEngine_2<PseudoRandom>(process_BS,10,Null<Size>(),
+																										true,false,10000,Null<Real>(),
+																										Null<Size>(), SeedGenerator::instance().get(),
+																										true)));
+	
 		clock_t t_debut_2 = clock();
 
-		std::cout << "Prix de l'option " << option_2.NPV() << std::endl;
+		std::cout << "Prix de l'option  " << option_2.NPV() << std::endl;
 		printf("Temps d'execution: %.2fs\n", (double)(clock() - t_debut_2) / CLOCKS_PER_SEC);
 		std::cout << "Erreur d'estimation " << option_2.errorEstimate() << std::endl;
-		system("pause");
+		std::cout << "     " << std::endl;
 
 		return 0;
 
