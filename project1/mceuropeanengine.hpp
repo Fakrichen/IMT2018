@@ -74,27 +74,21 @@ namespace QuantLib {
        
       private: 
         bool constant_; //! définition de l'attribut boolean
-        boost::shared_ptr<GeneralizedBlackScholesProcess> process_;
-        bool antithetic_;
-        Size steps_, stepsPerYear_, samples_, maxSamples_;
-        Real tolerance_;
-        bool brownianBridge_;
-        BigNatural seed_;        
+      public: //! surcharge de la méthode pathGenerator() de la classe MCVanillaEngine
         
-      public: //! méthode pathGenerator() reprise de la classe MCVanillaEngine
         boost::shared_ptr<path_generator_type> pathGenerator() const {
-			Size dimensions = process_->factors();
+			Size dimensions = this->process_->factors();
 			TimeGrid grid = this->timeGrid();
 			typename RNG::rsg_type generator =
-					RNG::make_sequence_generator(dimensions*(grid.size()-1),seed_);
+					RNG::make_sequence_generator(dimensions*(grid.size()-1),this->seed_);
+					
 			if (this->constant_ ){
 				boost::shared_ptr<GeneralizedBlackScholesProcess> process =boost::dynamic_pointer_cast<GeneralizedBlackScholesProcess>(this->process_);
 				boost::shared_ptr<PlainVanillaPayoff> payoff = boost::dynamic_pointer_cast<PlainVanillaPayoff>(this->arguments_.payoff);
                 QL_REQUIRE(payoff, "non-plain payoff given");
-	
-	
 				return boost::shared_ptr<path_generator_type>(
-                                        new path_generator_type(boost::shared_ptr<constantBlackScholesProcess> (new constantBlackScholesProcess(process->stateVariable(),
+                                        new path_generator_type(boost::shared_ptr<constantBlackScholesProcess> (
+                                        new constantBlackScholesProcess(process->stateVariable(),
                                         this->arguments_.exercise->lastDate(),
                                         payoff->strike(),
                                         process->riskFreeRate(),
@@ -102,15 +96,14 @@ namespace QuantLib {
                                         process->blackVolatility(), 
                                         process->dividendYield()
                                                                 )),grid,
-											generator, brownianBridge_)
-                                        
-                                          );				
-			}	
+											generator, this->brownianBridge_));
+                                  }	
+			
 			else{
 				return boost::shared_ptr<path_generator_type>(
-					new path_generator_type(process_, grid,
-											generator, brownianBridge_));				
-                        }				
+					new path_generator_type(this->process_, grid
+											,generator, this->brownianBridge_));				
+                 }				
 			}
     };
  
